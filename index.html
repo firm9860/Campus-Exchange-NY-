@@ -102,12 +102,16 @@
         </section>
 
         <section id="backend" class="hidden space-y-6">
-            <h2 class="text-3xl font-bold text-purple-800 border-b pb-4">Database: Transactions & Orders</h2>
+            <div class="flex justify-between items-center border-b pb-4">
+                <h2 class="text-3xl font-bold text-purple-800">Database: Transactions & Orders</h2>
+                <button onclick="factoryReset()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold shadow-md">⚠️ Reset Entire Database</button>
+            </div>
             <p class="text-gray-600">Raw view of the `orders` table in the database. Restricted to system administrators.</p>
+            
             <div class="bg-gray-900 text-gray-100 p-6 rounded-xl shadow-md border border-gray-700">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-purple-400">SELECT * FROM orders;</h3>
-                    <button onclick="clearDatabase()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">TRUNCATE TABLE</button>
+                    <button onclick="clearTransactions()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">TRUNCATE TABLE</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
@@ -141,17 +145,25 @@
     </main>
 
     <script>
-        // --- 1. SIMULATED DATABASE INITIALIZATION ---
+        // --- 1. SIMULATED DATABASE INITIALIZATION (Now with 12 items) ---
         const initialProducts = [
             { id: 101, title: "Danby Mini Fridge", price: 50, desc: "Used for 1 year. Clean.", seller: "Student_A" },
             { id: 102, title: "Intro to Chem Textbook", price: 25, desc: "Slight highlighting.", seller: "Student_B" },
             { id: 103, title: "Desk Lamp + Bulbs", price: 0, desc: "Giving this away for free!", seller: "Student_C" },
-            { id: 104, title: "Storage Bins (Set of 3)", price: 15, desc: "Fits under dorm beds.", seller: "Student_A" }
+            { id: 104, title: "Storage Bins (Set of 3)", price: 15, desc: "Fits under dorm beds.", seller: "Student_A" },
+            { id: 105, title: "Keurig Coffee Maker", price: 20, desc: "Works perfectly, comes with a few K-cups.", seller: "Student_D" },
+            { id: 106, title: "Calculus Early Transcendentals", price: 40, desc: "8th Edition. Required for Math 101.", seller: "Student_E" },
+            { id: 107, title: "Ergonomic Desk Chair", price: 35, desc: "Very comfortable for late-night studying.", seller: "Student_B" },
+            { id: 108, title: "Twin XL Mattress Topper", price: 10, desc: "Memory foam, 2 inches thick. Washed.", seller: "Student_F" },
+            { id: 109, title: "Brita Water Pitcher", price: 0, desc: "Needs a new filter, otherwise great.", seller: "Student_C" },
+            { id: 110, title: "Microwave (700W)", price: 30, desc: "Microwave plate included. Heats well.", seller: "Student_G" },
+            { id: 111, title: "Standing Fan", price: 15, desc: "Oscillating fan, 3 speeds. Essential for un-airconditioned dorms.", seller: "Student_H" },
+            { id: 112, title: "Area Rug (5x7)", price: 20, desc: "Grey geometric pattern, freshly vacuumed.", seller: "Student_A" }
         ];
 
         if (!localStorage.getItem('products')) localStorage.setItem('products', JSON.stringify(initialProducts));
         if (!localStorage.getItem('cart')) localStorage.setItem('cart', JSON.stringify([]));
-        if (!localStorage.getItem('transactions')) localStorage.setItem('transactions', JSON.stringify([])); // New DB Table
+        if (!localStorage.getItem('transactions')) localStorage.setItem('transactions', JSON.stringify([]));
 
         let currentRole = 'guest';
 
@@ -181,7 +193,7 @@
             
             document.getElementById('nav-cart').classList.toggle('hidden', currentRole === 'guest');
             document.getElementById('nav-admin').classList.toggle('hidden', currentRole !== 'admin');
-            document.getElementById('nav-backend').classList.toggle('hidden', currentRole !== 'admin'); // Backend Nav visibility
+            document.getElementById('nav-backend').classList.toggle('hidden', currentRole !== 'admin');
             
             const addListingBtn = document.getElementById('btn-add-listing');
             if(addListingBtn) addListingBtn.classList.toggle('hidden', currentRole === 'guest');
@@ -196,7 +208,7 @@
         function renderMarket() {
             const products = getProducts();
             const grid = document.getElementById('product-grid');
-            if(products.length === 0) return grid.innerHTML = `<p class="col-span-full text-center text-gray-500">No items listed.</p>`;
+            if(products.length === 0) return grid.innerHTML = `<p class="col-span-full text-center text-gray-500">No items listed. The marketplace has been bought out!</p>`;
 
             grid.innerHTML = products.map(p => `
                 <div class="bg-white p-5 rounded-xl shadow border border-gray-100 flex flex-col justify-between">
@@ -234,6 +246,9 @@
 
         function addToCart(productId) {
             const product = getProducts().find(p => p.id === productId);
+            // Prevent adding the same item twice
+            if(getCart().some(p => p.id === productId)) return alert("Item is already in your cart!");
+            
             const cart = getCart();
             cart.push(product);
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -279,11 +294,11 @@
             const cart = getCart();
             if(cart.length === 0) return alert("Cart is empty.");
             
-            // 1. Calculate totals and create item list
+            // 1. Calculate totals
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             const itemNames = cart.map(item => item.title).join(', ');
 
-            // 2. Create Transaction Record
+            // 2. Log the Transaction
             const transaction = {
                 orderId: 'ORD-' + Math.floor(Math.random() * 1000000),
                 date: new Date().toLocaleString(),
@@ -292,16 +307,24 @@
                 total: total
             };
 
-            // 3. Save to Database
             const txns = JSON.parse(localStorage.getItem('transactions'));
             txns.push(transaction);
             localStorage.setItem('transactions', JSON.stringify(txns));
+
+            // 3. REMOVE ITEMS FROM MARKETPLACE (Bug Fix Implementation)
+            let products = getProducts();
+            const purchasedIds = cart.map(item => item.id);
+            // Filter out products that match the IDs of the items in the cart
+            products = products.filter(p => !purchasedIds.includes(p.id));
+            localStorage.setItem('products', JSON.stringify(products));
             
             // 4. Clear Cart
             localStorage.setItem('cart', JSON.stringify([]));
             updateCartCount();
-            showSection('home');
-            alert("Order placed! Admins can view this in the Database viewer.");
+            
+            // 5. Redirect and Notify
+            showSection('market');
+            alert(`Order placed successfully!\nTotal: $${total.toFixed(2)}\n\nThe purchased items have been removed from the marketplace.`);
         }
 
         // --- 6. ADMIN & BACKEND LOGIC ---
@@ -343,10 +366,17 @@
             `).join('');
         }
 
-        function clearDatabase() {
-            if(confirm("DANGER: This will wipe all transaction history. Proceed?")) {
+        function clearTransactions() {
+            if(confirm("This will wipe all transaction history. Proceed?")) {
                 localStorage.setItem('transactions', JSON.stringify([]));
                 renderBackend();
+            }
+        }
+
+        function factoryReset() {
+            if(confirm("WARNING: This will reset the entire database back to the default 12 items and clear all carts/transactions. Proceed?")) {
+                localStorage.clear();
+                location.reload(); // Refresh the page to trigger initialization
             }
         }
 
