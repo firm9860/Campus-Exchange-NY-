@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Exchange NY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <nav class="bg-blue-800 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold cursor-pointer" onclick="showSection('home')">🎓 Campus Exchange NY</h1>
+            <div class="space-x-4 hidden md:flex items-center">
+                <button onclick="showSection('home')" class="hover:text-blue-300">Home</button>
+                <button onclick="showSection('market')" class="hover:text-blue-300">Marketplace</button>
+                <button onclick="showSection('about')" class="hover:text-blue-300">About/Contact</button>
+                
+                <button id="nav-cart" onclick="showSection('cart')" class="hover:text-blue-300 font-bold text-green-300 hidden">🛒 Cart (<span id="cart-count">0</span>)</button>
+                <button id="nav-admin" onclick="showSection('admin')" class="hover:text-blue-300 font-bold text-red-300 hidden">⚙️ Admin</button>
+                <button id="nav-backend" onclick="showSection('backend')" class="hover:text-blue-300 font-bold text-purple-300 hidden">🗄️ Database Viewer</button>
+                
+                <select id="role-selector" onchange="changeRole()" class="text-black p-1 rounded border-2 border-orange-400 bg-orange-50 font-bold text-sm">
+                    <option value="guest">Role: Guest</option>
+                    <option value="student">Role: Verified Student</option>
+                    <option value="admin">Role: Platform Admin</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-6 min-h-screen">
+        
+        <section id="home" class="text-center py-20 space-y-6">
+            <h2 class="text-5xl font-extrabold text-blue-900">NYC Students: Buy, Sell, Sustain.</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">The centralized digital marketplace for college students. Save money, reduce dorm waste, and help your campus community thrive.</p>
+            <div class="flex justify-center space-x-4 pt-6">
+                <button onclick="showSection('market')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition">Start Shopping</button>
+                <button onclick="showSection('about')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-lg font-bold shadow transition">Learn More</button>
+            </div>
+        </section>
+
+        <section id="market" class="hidden space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h2 class="text-3xl font-bold">Campus Marketplace</h2>
+                <button id="btn-add-listing" onclick="showSection('add-product')" class="hidden bg-green-600 text-white px-4 py-2 rounded font-bold hover:bg-green-700">+ Post an Item</button>
+            </div>
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                </div>
+        </section>
+
+        <section id="add-product" class="hidden max-w-lg mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200 mt-10">
+            <h2 class="text-2xl font-bold mb-6">Create a Listing</h2>
+            <form id="add-form" onsubmit="handleAddProduct(event)" class="space-y-4">
+                <div>
+                    <label class="block font-semibold mb-1">Item Title</label>
+                    <input type="text" id="add-title" required class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Price ($)</label>
+                    <input type="number" id="add-price" required class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Description</label>
+                    <textarea id="add-desc" required class="w-full border p-2 rounded"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Post Item</button>
+                <button type="button" onclick="showSection('market')" class="w-full bg-gray-100 text-gray-700 py-2 rounded mt-2">Cancel</button>
+            </form>
+        </section>
+
+        <section id="cart" class="hidden max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200 mt-10">
+            <h2 class="text-3xl font-bold mb-6">Your Cart</h2>
+            <div id="cart-items" class="space-y-4 mb-6">
+                </div>
+            <div class="border-t pt-4 flex justify-between items-center">
+                <h3 class="text-2xl font-bold">Total: $<span id="cart-total">0.00</span></h3>
+                <button onclick="checkout()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700">Checkout / Claim</button>
+            </div>
+        </section>
+
+        <section id="admin" class="hidden space-y-6">
+            <h2 class="text-3xl font-bold text-red-700 border-b pb-4">Platform Administration</h2>
+            <p class="text-gray-600">Manage all active platform listings and enforce community guidelines below.</p>
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <h3 class="text-xl font-bold mb-4">Active Listings Management</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 border-b">
+                                <th class="p-3">ID</th>
+                                <th class="p-3">Item</th>
+                                <th class="p-3">Price</th>
+                                <th class="p-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="backend" class="hidden space-y-6">
+            <h2 class="text-3xl font-bold text-purple-800 border-b pb-4">Database: Transactions & Orders</h2>
+            <p class="text-gray-600">Raw view of the `orders` table in the database. Restricted to system administrators.</p>
+            <div class="bg-gray-900 text-gray-100 p-6 rounded-xl shadow-md border border-gray-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-purple-400">SELECT * FROM orders;</h3>
+                    <button onclick="clearDatabase()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">TRUNCATE TABLE</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-800 border-b border-gray-700 text-gray-300">
+                                <th class="p-3">Order_ID</th>
+                                <th class="p-3">Timestamp</th>
+                                <th class="p-3">Purchaser_Role</th>
+                                <th class="p-3">Items_Purchased</th>
+                                <th class="p-3">Total_Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="backend-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="hidden max-w-3xl mx-auto py-12 space-y-8 text-lg text-gray-700">
+            <h2 class="text-4xl font-bold text-blue-900">About Us</h2>
+            <p>Campus Exchange NY was created to solve a massive problem in NYC dorms: move-out waste.</p>
+            <p>Our centralized digital marketplace connects students to buy, sell, and give away items, making campus life more affordable and sustainable.</p>
+            <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                <h3 class="font-bold text-2xl text-blue-800 mb-2">Contact Support</h3>
+                <p>Email: support@campusexchangeny.edu</p>
+                <p>Office: Student Union Building, Room 402</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 1. SIMULATED DATABASE INITIALIZATION ---
+        const initialProducts = [
+            { id: 101, title: "Danby Mini Fridge", price: 50, desc: "Used for 1 year. Clean.", seller: "Student_A" },
+            { id: 102, title: "Intro to Chem Textbook", price: 25, desc: "Slight highlighting.", seller: "Student_B" },
+            { id: 103, title: "Desk Lamp + Bulbs", price: 0, desc: "Giving this away for free!", seller: "Student_C" },
+            { id: 104, title: "Storage Bins (Set of 3)", price: 15, desc: "Fits under dorm beds.", seller: "Student_A" }
+        ];
+
+        if (!localStorage.getItem('products')) localStorage.setItem('products', JSON.stringify(initialProducts));
+        if (!localStorage.getItem('cart')) localStorage.setItem('cart', JSON.stringify([]));
+        if (!localStorage.getItem('transactions')) localStorage.setItem('transactions', JSON.stringify([])); // New DB Table
+
+        let currentRole = 'guest';
+
+        // --- 2. CORE LOGIC & ROUTING ---
+        function showSection(sectionId) {
+            // Security Guards
+            if (sectionId === 'cart' && currentRole === 'guest') return alert("Guests cannot access the cart. Switch to Student.");
+            if ((sectionId === 'admin' || sectionId === 'backend') && currentRole !== 'admin') return alert("Access Denied. Admins only.");
+            if (sectionId === 'add-product' && currentRole === 'guest') return alert("Only verified students can post items.");
+
+            // Hide all, show target
+            ['home', 'market', 'cart', 'admin', 'backend', 'about', 'add-product'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Render data
+            if (sectionId === 'market') renderMarket();
+            if (sectionId === 'cart') renderCart();
+            if (sectionId === 'admin') renderAdmin();
+            if (sectionId === 'backend') renderBackend();
+        }
+
+        // --- 3. ROLE MANAGEMENT ---
+        function changeRole() {
+            currentRole = document.getElementById('role-selector').value;
+            
+            document.getElementById('nav-cart').classList.toggle('hidden', currentRole === 'guest');
+            document.getElementById('nav-admin').classList.toggle('hidden', currentRole !== 'admin');
+            document.getElementById('nav-backend').classList.toggle('hidden', currentRole !== 'admin'); // Backend Nav visibility
+            
+            const addListingBtn = document.getElementById('btn-add-listing');
+            if(addListingBtn) addListingBtn.classList.toggle('hidden', currentRole === 'guest');
+
+            showSection('home');
+            updateCartCount();
+        }
+
+        // --- 4. PRODUCT & MARKETPLACE LOGIC ---
+        function getProducts() { return JSON.parse(localStorage.getItem('products')); }
+
+        function renderMarket() {
+            const products = getProducts();
+            const grid = document.getElementById('product-grid');
+            if(products.length === 0) return grid.innerHTML = `<p class="col-span-full text-center text-gray-500">No items listed.</p>`;
+
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white p-5 rounded-xl shadow border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">${p.title}</h3>
+                        <p class="text-2xl font-black text-green-600 my-2">${p.price === 0 ? 'FREE' : '$' + p.price}</p>
+                        <p class="text-sm text-gray-600 mb-4">${p.desc}</p>
+                        <p class="text-xs text-blue-500 mb-4">Seller: ${p.seller}</p>
+                    </div>
+                    ${currentRole !== 'guest' 
+                        ? `<button onclick="addToCart(${p.id})" class="w-full bg-blue-100 text-blue-800 py-2 rounded font-bold hover:bg-blue-200">Add to Cart</button>`
+                        : `<button disabled class="w-full bg-gray-100 text-gray-400 py-2 rounded cursor-not-allowed">Log in to Buy</button>`
+                    }
+                </div>
+            `).join('');
+        }
+
+        function handleAddProduct(e) {
+            e.preventDefault();
+            const title = document.getElementById('add-title').value;
+            const price = parseFloat(document.getElementById('add-price').value);
+            const desc = document.getElementById('add-desc').value;
+
+            const products = getProducts();
+            products.push({ id: Date.now(), title, price, desc, seller: 'You (Student)' });
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            e.target.reset();
+            showSection('market');
+            alert("Item successfully listed!");
+        }
+
+        // --- 5. CART & ORDERING LOGIC ---
+        function getCart() { return JSON.parse(localStorage.getItem('cart')); }
+
+        function addToCart(productId) {
+            const product = getProducts().find(p => p.id === productId);
+            const cart = getCart();
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            alert(`${product.title} added to cart!`);
+        }
+
+        function updateCartCount() { document.getElementById('cart-count').innerText = getCart().length; }
+
+        function renderCart() {
+            const cart = getCart();
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Your cart is empty.</p>`;
+                document.getElementById('cart-total').innerText = "0.00";
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((p, i) => {
+                total += p.price;
+                return `
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded border">
+                    <div><h4 class="font-bold">${p.title}</h4></div>
+                    <div class="flex items-center space-x-4">
+                        <span class="font-bold text-green-600">${p.price === 0 ? 'FREE' : '$' + p.price}</span>
+                        <button onclick="removeFromCart(${i})" class="text-red-500 text-sm hover:underline">Remove</button>
+                    </div>
+                </div>`
+            }).join('');
+            document.getElementById('cart-total').innerText = total.toFixed(2);
+        }
+
+        function removeFromCart(index) {
+            const cart = getCart();
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            renderCart();
+        }
+
+        function checkout() {
+            const cart = getCart();
+            if(cart.length === 0) return alert("Cart is empty.");
+            
+            // 1. Calculate totals and create item list
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const itemNames = cart.map(item => item.title).join(', ');
+
+            // 2. Create Transaction Record
+            const transaction = {
+                orderId: 'ORD-' + Math.floor(Math.random() * 1000000),
+                date: new Date().toLocaleString(),
+                role: currentRole.toUpperCase(),
+                items: itemNames,
+                total: total
+            };
+
+            // 3. Save to Database
+            const txns = JSON.parse(localStorage.getItem('transactions'));
+            txns.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(txns));
+            
+            // 4. Clear Cart
+            localStorage.setItem('cart', JSON.stringify([]));
+            updateCartCount();
+            showSection('home');
+            alert("Order placed! Admins can view this in the Database viewer.");
+        }
+
+        // --- 6. ADMIN & BACKEND LOGIC ---
+        function renderAdmin() {
+            const products = getProducts();
+            document.getElementById('admin-table-body').innerHTML = products.map(p => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 text-gray-500">#${p.id}</td>
+                    <td class="p-3 font-semibold">${p.title}</td>
+                    <td class="p-3">${p.price === 0 ? 'FREE' : '$' + p.price}</td>
+                    <td class="p-3"><button onclick="adminDeleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function adminDeleteProduct(id) {
+            if(!confirm("Remove this listing?")) return;
+            localStorage.setItem('products', JSON.stringify(getProducts().filter(p => p.id !== id)));
+            renderAdmin();
+        }
+
+        function renderBackend() {
+            const txns = JSON.parse(localStorage.getItem('transactions'));
+            const tbody = document.getElementById('backend-table-body');
+            
+            if(txns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-gray-500 text-center">No orders have been placed yet.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = txns.map(t => `
+                <tr class="border-b border-gray-700 hover:bg-gray-800">
+                    <td class="p-3 font-mono text-purple-300">${t.orderId}</td>
+                    <td class="p-3 text-sm">${t.date}</td>
+                    <td class="p-3 text-sm">${t.role}</td>
+                    <td class="p-3 truncate max-w-xs" title="${t.items}">${t.items}</td>
+                    <td class="p-3 font-bold text-green-400">$${t.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearDatabase() {
+            if(confirm("DANGER: This will wipe all transaction history. Proceed?")) {
+                localStorage.setItem('transactions', JSON.stringify([]));
+                renderBackend();
+            }
+        }
+
+        // Init
+        updateCartCount();
+    </script>
+</body>
+</html>
