@@ -411,6 +411,50 @@
                 location.reload(); // Refresh the page to trigger initialization
             }
         }
+        // --- 7. AUTHENTICATION (LOGIN/SIGNUP) LOGIC ---
+let isLoginMode = true;
+
+function openAuthModal() {
+    document.getElementById('auth-modal').classList.remove('hidden');
+}
+
+function closeAuthModal() {
+    document.getElementById('auth-modal').classList.add('hidden');
+    document.getElementById('auth-form').reset(); // Clear inputs on close
+}
+
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    
+    // Update UI text based on mode
+    document.getElementById('auth-title').innerText = isLoginMode ? "Login" : "Create Account";
+    document.getElementById('auth-toggle-text').innerText = isLoginMode ? "Don't have an account?" : "Already have an account?";
+    document.getElementById('auth-toggle-btn').innerText = isLoginMode ? "Sign Up" : "Login";
+    
+    // Show/hide the Full Name field
+    const nameField = document.getElementById('name-field');
+    if (isLoginMode) {
+        nameField.classList.add('hidden');
+        document.getElementById('auth-name').removeAttribute('required');
+    } else {
+        nameField.classList.remove('hidden');
+        document.getElementById('auth-name').setAttribute('required', 'true');
+    }
+}
+
+function handleAuth(e) {
+    e.preventDefault(); // Prevent page reload
+    
+    // Simulate successful login/signup
+    const email = document.getElementById('auth-email').value;
+    alert(isLoginMode ? `Successfully logged in as ${email}!` : `Account created for ${email}!`);
+    
+    closeAuthModal();
+    
+    // Automatically switch them to 'Verified Student' role to simulate logging in
+    document.getElementById('role-selector').value = 'student';
+    changeRole(); 
+}
 
         // Init
         updateCartCount();
