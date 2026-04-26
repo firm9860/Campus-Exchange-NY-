@@ -20,6 +20,10 @@
                 <button id="nav-admin" onclick="showSection('admin')" class="hover:text-blue-300 font-bold text-red-300 hidden">⚙️ Admin</button>
                 <button id="nav-backend" onclick="showSection('backend')" class="hover:text-blue-300 font-bold text-purple-300 hidden">🗄️ Database Viewer</button>
                 
+            <div id="auth-buttons" class="flex items-center gap-3">
+                <button onclick="openModal('login')" class="border border-white/40 text-white px-4 py-1.5 rounded-md text-sm hover:bg-white/10">Log in</button>
+                <button onclick="openModal('signup')" class="bg-white text-blue-800 px-4 py-1.5 rounded-md text-sm font-bold hover:bg-blue-100">Sign up</button>
+            </div>
                 <select id="role-selector" onchange="changeRole()" class="text-black p-1 rounded border-2 border-orange-400 bg-orange-50 font-bold text-sm">
                     <option value="guest">Role: Guest</option>
                     <option value="student">Role: Verified Student</option>
