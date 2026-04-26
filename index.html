@@ -142,6 +142,37 @@
                 <p>Office: Student Union Building, Room 402</p>
             </div>
         </section>
+        <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center backdrop-blur-sm">
+    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full relative">
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
+        
+        <h2 id="auth-title" class="text-3xl font-bold text-blue-900 mb-6">Login</h2>
+        
+        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+            <div id="name-field" class="hidden">
+                <label class="block font-semibold mb-1 text-gray-700">Full Name</label>
+                <input type="text" id="auth-name" class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label class="block font-semibold mb-1 text-gray-700">Student Email (.edu)</label>
+                <input type="email" id="auth-email" required class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label class="block font-semibold mb-1 text-gray-700">Password</label>
+                <input type="password" id="auth-pass" required class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500">
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition shadow-md mt-2">Submit</button>
+        </form>
+        
+        <p class="mt-6 text-center text-gray-600 border-t pt-4">
+            <span id="auth-toggle-text">Don't have an account?</span>
+            <button onclick="toggleAuthMode()" class="text-blue-600 font-bold hover:underline ml-1" id="auth-toggle-btn">Sign Up</button>
+        </p>
+    </div>
+</div>
 
     </main>
 
