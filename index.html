@@ -16,7 +16,7 @@
         .star-rating { color: #fbbf24; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
     <nav class="bg-blue-900 text-white px-6 py-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
@@ -25,20 +25,12 @@
                 <button onclick="showSection('home')" class="hover:text-blue-300 text-sm">Home</button>
                 <button onclick="showSection('market')" class="hover:text-blue-300 text-sm">Marketplace</button>
                 <button onclick="showSection('about')" class="hover:text-blue-300 text-sm">About / T&C</button>
-
-                <button id="nav-cart" onclick="showSection('cart')" class="hidden hover:text-blue-300 font-semibold text-green-300 text-sm">
-                    🛒 Cart (<span id="cart-count">0</span>)
-                </button>
-                <button id="nav-purchases" onclick="showSection('purchases')" class="hidden hover:text-blue-300 font-semibold text-orange-300 text-sm">
-                    📦 My Purchases
-                </button>
-                <button id="nav-post" onclick="showSection('add-product')" class="hidden hover:text-blue-300 font-semibold text-yellow-300 text-sm">
-                    + Post Item
-                </button>
-                <button id="nav-profile" onclick="viewMyProfile()" class="hidden hover:text-blue-300 font-semibold text-blue-200 text-sm">
-                    👤 My Profile
-                </button>
-
+                
+                <button id="nav-cart" onclick="showSection('cart')" class="hidden hover:text-blue-300 font-semibold text-green-300 text-sm">🛒 Cart (<span id="cart-count">0</span>)</button>
+                <button id="nav-purchases" onclick="showSection('purchases')" class="hidden hover:text-blue-300 font-semibold text-orange-300 text-sm">📦 My Purchases</button>
+                <button id="nav-post" onclick="showSection('add-product')" class="hidden hover:text-blue-300 font-semibold text-yellow-300 text-sm">+ Post Item</button>
+                <button id="nav-profile" onclick="viewMyProfile()" class="hidden hover:text-blue-300 font-semibold text-blue-200 text-sm">👤 My Profile</button>
+                
                 <button id="nav-admin" onclick="showSection('admin')" class="hidden hover:text-blue-300 font-semibold text-red-300 text-sm">⚙️ Admin</button>
                 <button id="nav-backend" onclick="showSection('backend')" class="hidden hover:text-blue-300 font-semibold text-purple-300 text-sm">🗄️ DB Viewer</button>
 
@@ -54,11 +46,11 @@
         </div>
     </nav>
 
-    <main class="container mx-auto p-6 min-h-screen">
+    <main class="container mx-auto p-6 flex-grow">
 
         <section id="home" class="text-center py-20 space-y-6 fade-in">
-            <h2 class="brand-font text-5xl font-bold text-blue-900">NYC Students: Buy, Sell, Sustain.</h2>
-            <p class="text-xl text-gray-500 max-w-2xl mx-auto">The centralized marketplace for college students across NYC. Save money, reduce dorm waste, and help your campus community thrive.</p>
+            <h2 class="brand-font text-5xl font-bold text-blue-900">NY Students: Buy, Sell, Sustain.</h2>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto">The centralized marketplace for college students across NY (both SUNY and CUNY). Save money, reduce dorm waste, and help your campus community thrive.</p>
             <div class="flex justify-center space-x-4 pt-6">
                 <button onclick="showSection('market')" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition">Browse Listings</button>
                 <button onclick="showSection('about')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-lg font-bold transition">Learn More</button>
@@ -226,6 +218,7 @@
                 <div>
                     <label class="block font-medium mb-1 text-sm text-gray-700">Upload Images (Up to 3)</label>
                     <input type="file" id="add-image" multiple accept="image/png, image/jpeg, image/webp" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <p class="text-xs text-gray-500 mt-1">Each image must be smaller than 500KB to prevent database errors.</p>
                 </div>
                 <div>
                     <label class="block font-medium mb-1 text-sm text-gray-700">Description</label>
@@ -360,7 +353,7 @@
         <section id="about" class="hidden max-w-4xl mx-auto py-12 space-y-10 fade-in">
             <div class="text-center space-y-4">
                 <h2 class="brand-font text-4xl font-bold text-blue-900">About Campus Exchange NY</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Created to solve a massive problem in NYC dorms: move-out waste. We connect students to buy, sell, and give away items, making campus life more affordable and sustainable.</p>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Created to solve a massive problem in NY dorms: move-out waste. We connect students to buy, sell, and give away items, making campus life more affordable and sustainable.</p>
             </div>
             <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
                 <h3 class="brand-font font-bold text-2xl text-blue-800 mb-2">Contact Support</h3>
@@ -382,6 +375,11 @@
         </section>
 
     </main>
+
+    <footer class="mt-auto py-8 bg-white border-t border-gray-200 text-center">
+        <p class="text-sm text-gray-400 mb-3">Having technical issues? Did the page freeze from an image upload?</p>
+        <button onclick="localStorage.clear(); window.location.reload();" class="text-xs bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-4 py-2 rounded-lg font-bold transition">⚠️ Emergency Factory Reset</button>
+    </footer>
 
     <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full relative fade-in">
@@ -415,26 +413,45 @@
 
     <script>
     // ─────────────────────────────────────────────────────────────
-    // DB SCHEMA (localStorage)
+    // BULLETPROOF DB SCHEMA & SAFE ERROR HANDLING
     // ─────────────────────────────────────────────────────────────
     async function sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        if (typeof crypto !== 'undefined' && crypto.subtle) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        return btoa(message); 
     }
 
     function uuid() {
-        return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        return (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
             const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
     }
 
+    const MemoryVault = new Map();
     const DB = {
-        get: key => JSON.parse(localStorage.getItem(key)),
-        set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
+        get: key => {
+            try { 
+                const v = localStorage.getItem(key);
+                if (v !== null) return JSON.parse(v);
+                return MemoryVault.has(key) ? MemoryVault.get(key) : null;
+            } catch(e) { 
+                return MemoryVault.has(key) ? MemoryVault.get(key) : null; 
+            }
+        },
+        set: (key, val) => {
+            try {
+                localStorage.setItem(key, JSON.stringify(val));
+            } catch (e) {
+                console.warn("Storage full! Falling back to temporary session memory.");
+                MemoryVault.set(key, val);
+            }
+        },
         getOrDefault: (key, fallback) => {
-            const v = localStorage.getItem(key);
-            return v !== null ? JSON.parse(v) : fallback;
+            const val = DB.get(key);
+            return val !== null ? val : fallback;
         }
     };
 
@@ -598,32 +615,41 @@
 
         if (!email.endsWith('.edu')) return showAuthError('Only .edu email addresses are allowed.');
 
-        const users = DB.get('users');
-        const passwordHash = await sha256(password);
+        const users = DB.getOrDefault('users', []);
+        
+        try {
+            const passwordHash = await sha256(password);
 
-        if (authMode === 'signup') {
-            const name = document.getElementById('auth-name').value.trim();
-            if (!name) return showAuthError('Please enter your full name.');
-            if (users.some(u => u.email === email)) return showAuthError('An account with this email already exists.');
+            if (authMode === 'signup') {
+                const name = document.getElementById('auth-name').value.trim();
+                if (!name) return showAuthError('Please enter your full name.');
+                if (users.some(u => u.email === email)) return showAuthError('An account with this email already exists.');
 
-            const role = users.length === 0 ? 'admin' : 'student';
-            const newUser = { id: uuid(), name, email, passwordHash, role, createdAt: new Date().toISOString(), termsAccepted: false };
-            users.push(newUser);
-            DB.set('users', users);
-            _createSession(newUser);
-            closeAuthModal();
-        } else {
-            const user = users.find(u => u.email === email);
-            if (!user || user.passwordHash !== passwordHash) return showAuthError('Invalid email or password.');
-            _createSession(user);
-            closeAuthModal();
+                const role = users.length === 0 ? 'admin' : 'student';
+                const newUser = { id: uuid(), name, email, passwordHash, role, createdAt: new Date().toISOString(), termsAccepted: false };
+                users.push(newUser);
+                DB.set('users', users);
+                _createSession(newUser);
+                closeAuthModal();
+            } else {
+                const user = users.find(u => u.email === email);
+                if (!user || user.passwordHash !== passwordHash) return showAuthError('Invalid email or password.');
+                _createSession(user);
+                closeAuthModal();
+            }
+        } catch (err) {
+            showAuthError("An error occurred. If the browser is full, try the Emergency Reset.");
         }
     }
 
     function _createSession(user) {
-        DB.set('session', { userId: user.id, email: user.email, name: user.name, role: user.role, termsAccepted: user.termsAccepted || false });
-        updateNav();
-        showSection('home');
+        try {
+            DB.set('session', { userId: user.id, email: user.email, name: user.name, role: user.role, termsAccepted: user.termsAccepted || false });
+            updateNav();
+            showSection('home');
+        } catch(err) {
+            alert("Could not create session. Database full.");
+        }
     }
 
     // ── Shared Card Generator ──────────────────────────────────────
@@ -730,7 +756,7 @@
 
         document.getElementById('profile-name').textContent = sellerName;
         document.getElementById('profile-self-badge').classList.toggle('hidden', !isSelf);
-        document.getElementById('profile-actions').classList.toggle('hidden', isSelf);
+        document.getElementById('profile-actions').classList.toggle('hidden', !isSelf);
 
         const products = getProducts().filter(p => p.seller === sellerName);
         const grid = document.getElementById('profile-grid');
@@ -878,7 +904,7 @@
                     <span class="font-bold text-green-600 text-xl">$${o.total.toFixed(2)}</span>
                 </div>
                 <div class="mb-4">
-                    <p class="text-sm text-gray-500 font-semibold mb-2 uppercase tracking-wider">Items Purchased</p>
+                    <p class="text-sm text-gray-500 font-semibold mb-1 uppercase tracking-wider">Items Purchased</p>
                     <ul class="text-sm text-gray-800 list-disc list-inside ml-4">${itemsDisplay}</ul>
                 </div>
                 <div>
@@ -1095,7 +1121,7 @@
         updateCartCount();
         showSection('purchases'); 
         
-        alert(`Order placed successfully!\nTotal: $${total.toFixed(2)}\n\nAn email has been automatically sent to the seller(s) notifying them of your purchase and your chosen transfer method. The seller will be prompted to use the chat function to coordinate logistics (shipping tracking, direct delivery meetup, or exact pickup location).\n\nSold items have been removed from the marketplace.`);
+        alert(`Order placed successfully!\nTotal: $${total.toFixed(2)}\n\nAn email has been automatically sent to the seller(s) notifying them of your purchase and your chosen transfer method. The seller will be prompted to use the chat function to coordinate logistics.\n\nSold items have been removed from the marketplace.`);
     }
 
     // ── Admin Panel & DYNAMIC DB Viewer ───────────────────────────────────
