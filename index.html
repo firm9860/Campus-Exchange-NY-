@@ -11,38 +11,43 @@
         .brand-font { font-family: 'Space Grotesk', sans-serif; }
         .fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .star-rating { color: #fbbf24; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- NAV -->
     <nav class="bg-blue-900 text-white px-6 py-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="brand-font text-2xl font-bold cursor-pointer" onclick="showSection('home')">🎓 Campus Exchange NY</h1>
             <div class="space-x-4 hidden md:flex items-center">
                 <button onclick="showSection('home')" class="hover:text-blue-300 text-sm">Home</button>
                 <button onclick="showSection('market')" class="hover:text-blue-300 text-sm">Marketplace</button>
-                <button onclick="showSection('about')" class="hover:text-blue-300 text-sm">About</button>
+                <button onclick="showSection('about')" class="hover:text-blue-300 text-sm">About / T&C</button>
 
-                <!-- Student+ only -->
                 <button id="nav-cart" onclick="showSection('cart')" class="hidden hover:text-blue-300 font-semibold text-green-300 text-sm">
                     🛒 Cart (<span id="cart-count">0</span>)
+                </button>
+                <button id="nav-purchases" onclick="showSection('purchases')" class="hidden hover:text-blue-300 font-semibold text-orange-300 text-sm">
+                    📦 My Purchases
                 </button>
                 <button id="nav-post" onclick="showSection('add-product')" class="hidden hover:text-blue-300 font-semibold text-yellow-300 text-sm">
                     + Post Item
                 </button>
+                <button id="nav-profile" onclick="viewMyProfile()" class="hidden hover:text-blue-300 font-semibold text-blue-200 text-sm">
+                    👤 My Profile
+                </button>
 
-                <!-- Admin only -->
                 <button id="nav-admin" onclick="showSection('admin')" class="hidden hover:text-blue-300 font-semibold text-red-300 text-sm">⚙️ Admin</button>
                 <button id="nav-backend" onclick="showSection('backend')" class="hidden hover:text-blue-300 font-semibold text-purple-300 text-sm">🗄️ DB Viewer</button>
 
-                <!-- Auth state -->
                 <div id="nav-guest" class="flex items-center space-x-2">
                     <button onclick="openAuthModal('login')" class="text-sm hover:text-blue-300">Log in</button>
                     <button onclick="openAuthModal('signup')" class="bg-white text-blue-900 px-4 py-1.5 rounded-full text-sm font-bold hover:bg-blue-100 transition">Sign up</button>
                 </div>
                 <div id="nav-user" class="hidden flex items-center space-x-3">
-                    <span id="nav-user-label" class="text-sm text-blue-200"></span>
+                    <span id="nav-user-label" class="text-sm text-blue-200 border-r border-blue-700 pr-3"></span>
                     <button onclick="logout()" class="bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded-full text-sm font-semibold transition">Log out</button>
                 </div>
             </div>
@@ -51,7 +56,6 @@
 
     <main class="container mx-auto p-6 min-h-screen">
 
-        <!-- HOME -->
         <section id="home" class="text-center py-20 space-y-6 fade-in">
             <h2 class="brand-font text-5xl font-bold text-blue-900">NYC Students: Buy, Sell, Sustain.</h2>
             <p class="text-xl text-gray-500 max-w-2xl mx-auto">The centralized marketplace for college students across NYC. Save money, reduce dorm waste, and help your campus community thrive.</p>
@@ -61,50 +65,230 @@
             </div>
         </section>
 
-        <!-- MARKET -->
         <section id="market" class="hidden space-y-6 fade-in">
-            <div class="flex justify-between items-center border-b pb-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4">
                 <h2 class="brand-font text-3xl font-bold">Campus Marketplace</h2>
             </div>
-            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Search Item</label>
+                    <input type="text" id="filter-item" placeholder="e.g. Fridge, Textbook..." oninput="applyFilters()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Filter Location</label>
+                    <select id="filter-location" onchange="applyFilters()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                        <option value="">All Campuses</option>
+                        <optgroup label="SUNY Campuses">
+                            <option value="SUNY Albany">SUNY Albany</option>
+                            <option value="SUNY Binghamton">SUNY Binghamton</option>
+                            <option value="SUNY Buffalo">SUNY Buffalo</option>
+                            <option value="SUNY Cortland">SUNY Cortland</option>
+                            <option value="SUNY Fredonia">SUNY Fredonia</option>
+                            <option value="SUNY Geneseo">SUNY Geneseo</option>
+                            <option value="SUNY New Paltz">SUNY New Paltz</option>
+                            <option value="SUNY Oswego">SUNY Oswego</option>
+                            <option value="SUNY Purchase">SUNY Purchase</option>
+                            <option value="SUNY Stony Brook">SUNY Stony Brook</option>
+                        </optgroup>
+                        <optgroup label="CUNY Campuses">
+                            <option value="CUNY Baruch">CUNY Baruch</option>
+                            <option value="CUNY Brooklyn">CUNY Brooklyn</option>
+                            <option value="CUNY City College">CUNY City College</option>
+                            <option value="CUNY Hunter">CUNY Hunter</option>
+                            <option value="CUNY John Jay">CUNY John Jay</option>
+                            <option value="CUNY Lehman">CUNY Lehman</option>
+                            <option value="CUNY Queens">CUNY Queens</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Find Seller</label>
+                    <input type="text" id="filter-seller" placeholder="e.g. Student_A..." oninput="applyFilters()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div class="flex space-x-2">
+                    <div class="w-1/2">
+                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Min $</label>
+                        <input type="number" id="filter-min-price" min="0" placeholder="0" oninput="applyFilters()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Max $</label>
+                        <input type="number" id="filter-max-price" min="0" placeholder="Any" oninput="applyFilters()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="clearFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-bold transition w-full md:w-auto h-[42px]">Clear</button>
+                </div>
+            </div>
+
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-2"></div>
         </section>
 
-        <!-- ADD PRODUCT -->
+        <section id="profile" class="hidden space-y-6 fade-in">
+            <button onclick="showSection('market')" class="text-blue-600 hover:underline text-sm mb-2 font-bold">← Back to Marketplace</button>
+            
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="brand-font text-3xl font-bold text-gray-900 flex items-center space-x-2">
+                        <span id="profile-name">Seller Name</span>
+                        <span id="profile-self-badge" class="hidden bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-bold ml-2">You</span>
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1 flex items-center">
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold mr-2">Verified .edu</span>
+                        <span id="profile-rating-summary" class="ml-1 font-semibold text-gray-700"></span>
+                    </p>
+                </div>
+                <div id="profile-actions" class="flex space-x-3">
+                    <button onclick="contactSeller()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold shadow transition flex items-center">💬 Message</button>
+                    <button onclick="reportSeller()" class="bg-red-50 hover:bg-red-100 text-red-600 px-5 py-2.5 rounded-lg font-bold border border-red-200 transition flex items-center">🚩 Report</button>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold mt-8 border-b pb-2">Active Listings</h3>
+            <div id="profile-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+            <h3 class="text-xl font-bold mt-12 border-b pb-2">Seller Reviews</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <div class="md:col-span-2 space-y-4" id="profile-reviews-list"></div>
+                <div id="profile-review-form-container"></div>
+            </div>
+        </section>
+
+        <section id="purchases" class="hidden max-w-4xl mx-auto py-8 space-y-6 fade-in">
+            <h2 class="brand-font text-3xl font-bold border-b pb-4 text-orange-600">📦 My Purchases</h2>
+            <p class="text-gray-500 text-sm mb-4">A complete record of your past purchases and transfer details.</p>
+            <div id="purchases-list" class="space-y-4"></div>
+        </section>
+
         <section id="add-product" class="hidden max-w-lg mx-auto bg-white p-8 rounded-xl shadow-md border mt-10 fade-in">
             <h2 class="brand-font text-2xl font-bold mb-6">Post a Listing</h2>
+            <div id="upload-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4"></div>
+
             <form id="add-form" onsubmit="handleAddProduct(event)" class="space-y-4">
                 <div>
                     <label class="block font-medium mb-1 text-sm text-gray-700">Item Title</label>
                     <input type="text" id="add-title" required class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium mb-1 text-sm text-gray-700">Price ($)</label>
+                        <input type="number" id="add-price" required min="0" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1 text-sm text-gray-700">Campus Affiliation</label>
+                        <select id="add-location" required class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                            <option value="">Select a campus...</option>
+                            <optgroup label="SUNY Campuses">
+                                <option value="SUNY Albany">SUNY Albany</option>
+                                <option value="SUNY Binghamton">SUNY Binghamton</option>
+                                <option value="SUNY Buffalo">SUNY Buffalo</option>
+                                <option value="SUNY Cortland">SUNY Cortland</option>
+                                <option value="SUNY Fredonia">SUNY Fredonia</option>
+                                <option value="SUNY Geneseo">SUNY Geneseo</option>
+                                <option value="SUNY New Paltz">SUNY New Paltz</option>
+                                <option value="SUNY Oswego">SUNY Oswego</option>
+                                <option value="SUNY Purchase">SUNY Purchase</option>
+                                <option value="SUNY Stony Brook">SUNY Stony Brook</option>
+                            </optgroup>
+                            <optgroup label="CUNY Campuses">
+                                <option value="CUNY Baruch">CUNY Baruch</option>
+                                <option value="CUNY Brooklyn">CUNY Brooklyn</option>
+                                <option value="CUNY City College">CUNY City College</option>
+                                <option value="CUNY Hunter">CUNY Hunter</option>
+                                <option value="CUNY John Jay">CUNY John Jay</option>
+                                <option value="CUNY Lehman">CUNY Lehman</option>
+                                <option value="CUNY Queens">CUNY Queens</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                    <label class="block font-bold mb-2 text-sm text-blue-900">Permitted Transfer Methods</label>
+                    <p class="text-xs text-blue-700 mb-3">How are you willing to get this item to the buyer? (Check all that apply)</p>
+                    <div class="flex flex-col space-y-2">
+                        <label class="flex items-center space-x-2 text-sm text-gray-700">
+                            <input type="checkbox" id="add-transfer-mail" value="Mail" class="w-4 h-4 text-blue-600"> <span>Mail</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-sm text-gray-700">
+                            <input type="checkbox" id="add-transfer-delivery" value="Direct Delivery" class="w-4 h-4 text-blue-600"> <span>Direct Delivery (You travel to the buyer)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-sm text-gray-700">
+                            <input type="checkbox" id="add-transfer-pickup" value="Pickup" class="w-4 h-4 text-blue-600"> <span>Pickup (Buyer travels to you)</span>
+                        </label>
+                    </div>
+                    <div class="mt-3">
+                        <label class="block font-medium mb-1 text-xs text-blue-900">Specific Pickup Location / Details (Hidden until purchased)</label>
+                        <input type="text" id="add-specific-location" placeholder="e.g. North Hall, Room 402" class="w-full border border-blue-200 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block font-medium mb-1 text-sm text-gray-700">Price ($) — enter 0 for free</label>
-                    <input type="number" id="add-price" required min="0" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <label class="block font-medium mb-1 text-sm text-gray-700">Upload Images (Up to 3)</label>
+                    <input type="file" id="add-image" multiple accept="image/png, image/jpeg, image/webp" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                 </div>
                 <div>
                     <label class="block font-medium mb-1 text-sm text-gray-700">Description</label>
                     <textarea id="add-desc" required rows="3" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-2.5 rounded-lg font-bold transition">Post Item</button>
+                
+                <div id="post-terms-container" class="hidden bg-blue-50 p-3 rounded-lg border border-blue-100 mt-2">
+                    <label class="flex items-start space-x-3 text-sm cursor-pointer">
+                        <input type="checkbox" id="post-terms-checkbox" class="mt-1 w-4 h-4 text-blue-600 rounded">
+                        <span class="text-gray-700 font-medium leading-snug">
+                            I agree to the <a href="#" onclick="showSection('about')" class="text-blue-600 underline hover:text-blue-800">Terms and Conditions</a> and confirm that this item does not violate platform policies.
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-2.5 rounded-lg font-bold transition mt-2">Post Item</button>
                 <button type="button" onclick="showSection('market')" class="w-full bg-gray-100 text-gray-600 py-2 rounded-lg mt-1 text-sm hover:bg-gray-200">Cancel</button>
             </form>
         </section>
 
-        <!-- CART -->
         <section id="cart" class="hidden max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md border mt-10 fade-in">
             <h2 class="brand-font text-3xl font-bold mb-6">Your Cart</h2>
             <div id="cart-items" class="space-y-4 mb-6"></div>
-            <div class="border-t pt-4 flex justify-between items-center">
-                <h3 class="text-2xl font-bold">Total: $<span id="cart-total">0.00</span></h3>
-                <button onclick="checkout()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700">Checkout</button>
+            
+            <div class="border-t pt-6">
+                <div id="cart-terms-container" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
+                    <label class="flex items-start space-x-3 text-sm cursor-pointer">
+                        <input type="checkbox" id="cart-terms-checkbox" class="mt-1 w-4 h-4 text-blue-600 rounded">
+                        <span class="text-gray-700 font-medium leading-snug">
+                            I have read and agree to the <a href="#" onclick="showSection('about')" class="text-blue-600 underline hover:text-blue-800">Terms and Conditions</a> regarding purchases and buyer responsibilities.
+                        </span>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Total: $<span id="cart-total">0.00</span></h3>
+                    <button onclick="checkout()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700">Checkout</button>
+                </div>
             </div>
         </section>
 
-        <!-- ADMIN -->
         <section id="admin" class="hidden space-y-6 fade-in">
             <h2 class="brand-font text-3xl font-bold text-red-700 border-b pb-4">Platform Administration</h2>
-            <p class="text-gray-500 text-sm">Manage all active listings. Delete policy violations or spam.</p>
-            <div class="bg-white p-6 rounded-xl shadow-md border">
+            
+            <div class="bg-white p-6 rounded-xl shadow-md border border-red-100">
+                <h3 class="font-bold mb-4 text-lg text-red-700 flex items-center">🚩 Flagged Seller Reports</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-red-50 border-b text-red-800 uppercase text-xs tracking-wide">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Reported Seller</th>
+                                <th class="p-3">Reason</th>
+                                <th class="p-3">Reported By</th>
+                                <th class="p-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-reports-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md border mt-4">
                 <h3 class="font-bold mb-4 text-lg">Active Listings</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -112,7 +296,7 @@
                             <tr class="bg-gray-50 border-b text-gray-500 uppercase text-xs tracking-wide">
                                 <th class="p-3">ID</th>
                                 <th class="p-3">Item</th>
-                                <th class="p-3">Price</th>
+                                <th class="p-3">Location</th>
                                 <th class="p-3">Seller</th>
                                 <th class="p-3">Action</th>
                             </tr>
@@ -132,6 +316,7 @@
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Role</th>
                                 <th class="p-3">Joined</th>
+                                <th class="p-3">T&C</th>
                                 <th class="p-3">Action</th>
                             </tr>
                         </thead>
@@ -141,56 +326,68 @@
             </div>
         </section>
 
-        <!-- BACKEND / DB VIEWER -->
         <section id="backend" class="hidden space-y-6 fade-in">
             <div class="flex justify-between items-center border-b pb-4">
                 <h2 class="brand-font text-3xl font-bold text-purple-800">Database Viewer</h2>
                 <button onclick="factoryReset()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold shadow text-sm">⚠️ Factory Reset</button>
             </div>
-            <p class="text-gray-500 text-sm">Raw view of the <code>orders</code> table. Restricted to administrators.</p>
+            <p class="text-gray-500 text-sm">Raw view of the platform database tables.</p>
             <div class="bg-gray-900 text-gray-100 p-6 rounded-xl shadow border border-gray-700">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-purple-400 font-mono">SELECT * FROM orders;</h3>
-                    <button onclick="clearTransactions()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs">TRUNCATE TABLE</button>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                    <div class="flex items-center space-x-2">
+                        <h3 class="text-lg font-bold text-purple-400 font-mono">SELECT * FROM</h3>
+                        <select id="db-table-select" onchange="renderBackend()" class="bg-gray-800 text-purple-400 font-mono border border-gray-600 rounded p-1 focus:outline-none">
+                            <option value="transactions">transactions</option>
+                            <option value="users">users</option>
+                            <option value="products">products</option>
+                            <option value="reviews">reviews</option>
+                            <option value="reports">reports</option>
+                            <option value="cart">cart</option>
+                        </select>
+                        <h3 class="text-lg font-bold text-purple-400 font-mono">;</h3>
+                    </div>
+                    <button onclick="clearSelectedTable()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs font-bold uppercase">Truncate Table</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[600px] border border-gray-700 rounded bg-gray-800">
                     <table class="w-full text-left border-collapse whitespace-nowrap text-sm">
-                        <thead>
-                            <tr class="bg-gray-800 border-b border-gray-700 text-gray-400 text-xs uppercase">
-                                <th class="p-3">Order_ID</th>
-                                <th class="p-3">Timestamp</th>
-                                <th class="p-3">Buyer</th>
-                                <th class="p-3">Items</th>
-                                <th class="p-3">Total</th>
-                            </tr>
-                        </thead>
+                        <thead id="backend-table-head" class="bg-gray-900 sticky top-0 z-10 border-b border-gray-700 shadow"></thead>
                         <tbody id="backend-table-body"></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- ABOUT -->
-        <section id="about" class="hidden max-w-3xl mx-auto py-12 space-y-8 text-lg text-gray-700 fade-in">
-            <h2 class="brand-font text-4xl font-bold text-blue-900">About Us</h2>
-            <p>Campus Exchange NY was created to solve a massive problem in NYC dorms: move-out waste.</p>
-            <p>Our centralized marketplace connects students to buy, sell, and give away items — making campus life more affordable and sustainable.</p>
-            <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
+        <section id="about" class="hidden max-w-4xl mx-auto py-12 space-y-10 fade-in">
+            <div class="text-center space-y-4">
+                <h2 class="brand-font text-4xl font-bold text-blue-900">About Campus Exchange NY</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Created to solve a massive problem in NYC dorms: move-out waste. We connect students to buy, sell, and give away items, making campus life more affordable and sustainable.</p>
+            </div>
+            <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
                 <h3 class="brand-font font-bold text-2xl text-blue-800 mb-2">Contact Support</h3>
-                <p>Email: support@campusexchangeny.edu</p>
-                <p>Office: Student Union Building, Room 402</p>
+                <p class="text-gray-700">Email: <a href="mailto:support@campusexchangeny.edu" class="text-blue-600 hover:underline">support@campusexchangeny.edu</a></p>
+                <p class="text-gray-700">Office: Student Union Building, Room 402</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 mt-12 space-y-6">
+                <h2 class="brand-font text-3xl font-bold border-b pb-4">Platform Terms & Conditions</h2>
+                <div class="space-y-4 text-sm text-gray-700 leading-relaxed">
+                    <p><strong>1. Acceptance of Terms</strong><br>By registering for an account, posting an item, or purchasing an item on Campus Exchange NY, you agree to comply with and be bound by these Terms and Conditions. If you do not agree to these terms, you must not use the platform.</p>
+                    <p><strong>2. Eligibility and User Conduct</strong><br>You must be a currently enrolled student with a valid `.edu` email address to post or purchase items. Users must conduct themselves professionally. Harassment, fraud, and abusive language are strictly prohibited and will result in immediate account termination.</p>
+                    <p><strong>3. Prohibited Items</strong><br>Sellers may not list illegal goods, weapons, hazardous materials, prescription drugs, alcohol, stolen property, or items recalled by the manufacturer. Campus Exchange NY administrators reserve the right to remove any listing deemed unsafe or inappropriate without prior notice.</p>
+                    <p><strong>4. Role of Campus Exchange NY</strong><br>Campus Exchange NY acts solely as a peer-to-peer venue to allow users to offer, sell, and buy items. We are not directly involved in the transaction between buyers and sellers. As a result, we have no control over the quality, safety, morality, or legality of any aspect of the items listed, the truth or accuracy of the listings, or the ability of sellers to sell items.</p>
+                    <p><strong>5. Dispute Resolution & Reviews</strong><br>Buyers and sellers are responsible for resolving disputes among themselves. Verified buyers may leave honest reviews based on their transactions. False or retaliatory reviews may result in account suspension. While our Administrative team may intervene in cases of platform policy violations (via the Report feature), we do not guarantee refunds, returns, or mediate financial disputes.</p>
+                    <p><strong>6. Limitation of Liability</strong><br>Under no circumstances shall Campus Exchange NY or its administrators be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the site or for the cost of procurement of substitute goods and services.</p>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- AUTH MODAL -->
     <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full relative fade-in">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl font-bold leading-none">&times;</button>
             <h2 id="auth-title" class="brand-font text-3xl font-bold text-blue-900 mb-2">Log in</h2>
             <p id="auth-subtitle" class="text-sm text-gray-500 mb-6"></p>
-
             <div id="auth-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4"></div>
 
             <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
@@ -219,39 +416,19 @@
     <script>
     // ─────────────────────────────────────────────────────────────
     // DB SCHEMA (localStorage)
-    //   users:        Array<{ id, name, email, passwordHash, role, createdAt }>
-    //   session:      { userId, email, name, role } | null
-    //   products:     Array<{ id, title, price, desc, seller, sellerId }>
-    //   cart:         Array<product>
-    //   transactions: Array<{ orderId, date, buyer, items, total }>
     // ─────────────────────────────────────────────────────────────
-
-    // ── Crypto helpers ────────────────────────────────────────────
-    /**
-     * SHA-256 hash using the Web Crypto API (available in all modern browsers
-     * and on GitHub Pages with HTTPS). Returns a hex string.
-     * @param {string} message
-     * @returns {Promise<string>}
-     */
     async function sha256(message) {
         const msgBuffer = new TextEncoder().encode(message);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        return Array.from(new Uint8Array(hashBuffer))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    /** Generates a UUID-v4-style ID without external dependencies. */
     function uuid() {
-        return crypto.randomUUID
-            ? crypto.randomUUID()
-            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-                const r = Math.random() * 16 | 0;
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
+        return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
     }
 
-    // ── Storage helpers ───────────────────────────────────────────
     const DB = {
         get: key => JSON.parse(localStorage.getItem(key)),
         set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
@@ -261,38 +438,34 @@
         }
     };
 
-    // ── Seed products on first load ───────────────────────────────
+    // ── Seed products with 12 items & Locations & Transfer Methods ─────────────
     const SEED_PRODUCTS = [
-        { id: 101, title: "Danby Mini Fridge", price: 50, desc: "Used for 1 year. Clean.", seller: "Student_A", sellerId: null },
-        { id: 102, title: "Intro to Chem Textbook", price: 25, desc: "Slight highlighting.", seller: "Student_B", sellerId: null },
-        { id: 103, title: "Desk Lamp + Bulbs", price: 0, desc: "Giving this away for free!", seller: "Student_C", sellerId: null },
-        { id: 104, title: "Storage Bins (Set of 3)", price: 15, desc: "Fits under dorm beds.", seller: "Student_A", sellerId: null },
-        { id: 105, title: "Keurig Coffee Maker", price: 20, desc: "Works perfectly, comes with a few K-cups.", seller: "Student_D", sellerId: null },
-        { id: 106, title: "Calculus Early Transcendentals", price: 40, desc: "8th Edition. Required for Math 101.", seller: "Student_E", sellerId: null },
-        { id: 107, title: "Ergonomic Desk Chair", price: 35, desc: "Very comfortable for late-night studying.", seller: "Student_B", sellerId: null },
-        { id: 108, title: "Twin XL Mattress Topper", price: 10, desc: "Memory foam, 2 inches thick. Washed.", seller: "Student_F", sellerId: null },
-        { id: 109, title: "Brita Water Pitcher", price: 0, desc: "Needs a new filter, otherwise great.", seller: "Student_C", sellerId: null },
-        { id: 110, title: "Microwave (700W)", price: 30, desc: "Microwave plate included. Heats well.", seller: "Student_G", sellerId: null },
-        { id: 111, title: "Standing Fan", price: 15, desc: "Oscillating fan, 3 speeds.", seller: "Student_H", sellerId: null },
-        { id: 112, title: "Area Rug (5x7)", price: 20, desc: "Grey geometric pattern, freshly vacuumed.", seller: "Student_A", sellerId: null }
+        { id: 101, title: "Danby Mini Fridge", price: 50, desc: "Used for 1 year. Clean.", location: "SUNY Binghamton", specificLocation: "Dorm Room 402", transferMethods: ["Pickup", "Direct Delivery"], seller: "Student_A", sellerId: null, images: ["https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=600&q=80"] },
+        { id: 102, title: "Intro to Chem Textbook", price: 25, desc: "Slight highlighting.", location: "CUNY Hunter", specificLocation: "Library Cafe", transferMethods: ["Mail", "Pickup"], seller: "Student_B", sellerId: null, images: ["https://m.media-amazon.com/images/I/91aJdJ5xWwL._AC_UF1000,1000_QL80_.jpg"] }, 
+        { id: 103, title: "Desk Lamp + Bulbs", price: 0, desc: "Giving this away for free!", location: "SUNY Stony Brook", specificLocation: "West Hall Lobby", transferMethods: ["Pickup"], seller: "Student_C", sellerId: null, images: ["https://i.ebayimg.com/images/g/VUwAAeSwZpxpeLAS/s-l1600.webp"] },
+        { id: 104, title: "Storage Bins (Set of 3)", price: 15, desc: "Fits under dorm beds.", location: "CUNY Baruch", specificLocation: "Student Center", transferMethods: ["Direct Delivery"], seller: "Student_A", sellerId: null, images: ["https://placehold.co/600x400/4338ca/ffffff?text=Storage+Bins"] },
+        { id: 105, title: "Keurig Coffee Maker", price: 20, desc: "Works perfectly, comes with a few K-cups.", location: "SUNY Buffalo", specificLocation: "", transferMethods: ["Mail", "Direct Delivery"], seller: "Student_D", sellerId: null, images: ["https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTM2mM16lvee_itPKq2gxtvA0A6Y1CmrvlP4j1kGdsx6N5eK22begPQ2kwka3qzKMviV-M5alxL6vYFX57xuthvEaEQJe6EjAX7J3T8mxJxlDq1Pvc3yghf-g&usqp=CAc"] }, 
+        { id: 106, title: "Calculus Early Transcendentals", price: 40, desc: "8th Edition. Required for Math 101.", location: "CUNY Queens", specificLocation: "Math Dept Office", transferMethods: ["Pickup", "Mail"], seller: "Student_E", sellerId: null, images: ["https://placehold.co/600x400/0f766e/ffffff?text=Calculus+Book"] },
+        { id: 107, title: "Ergonomic Desk Chair", price: 35, desc: "Very comfortable for late-night studying.", location: "SUNY Albany", specificLocation: "East Dorms", transferMethods: ["Pickup"], seller: "Student_B", sellerId: null, images: ["https://placehold.co/600x400/374151/ffffff?text=Desk+Chair"] },
+        { id: 108, title: "Twin XL Mattress Topper", price: 10, desc: "Memory foam, washed.", location: "CUNY City College", specificLocation: "TBD", transferMethods: ["Direct Delivery", "Pickup"], seller: "Student_F", sellerId: null, images: ["https://placehold.co/600x400/6d28d9/ffffff?text=Mattress+Topper"] },
+        { id: 109, title: "Brita Water Pitcher", price: 0, desc: "Needs a new filter, otherwise great.", location: "SUNY Fredonia", specificLocation: "Science Building", transferMethods: ["Pickup"], seller: "Student_C", sellerId: null, images: ["https://placehold.co/600x400/0369a1/ffffff?text=Brita+Pitcher"] },
+        { id: 110, title: "Microwave (700W)", price: 30, desc: "Microwave plate included. Heats well.", location: "CUNY John Jay", specificLocation: "North Hall", transferMethods: ["Pickup", "Direct Delivery"], seller: "Student_G", sellerId: null, images: ["https://placehold.co/600x400/1d4ed8/ffffff?text=Microwave"] },
+        { id: 111, title: "Standing Fan", price: 15, desc: "Oscillating fan, 3 speeds.", location: "SUNY New Paltz", specificLocation: "TBD", transferMethods: ["Direct Delivery"], seller: "Student_H", sellerId: null, images: ["https://placehold.co/600x400/15803d/ffffff?text=Standing+Fan"] },
+        { id: 112, title: "Area Rug (5x7)", price: 20, desc: "Grey geometric pattern, freshly vacuumed.", location: "CUNY Brooklyn", specificLocation: "South Hall", transferMethods: ["Pickup", "Mail"], seller: "Student_A", sellerId: null, images: ["https://placehold.co/600x400/9d174d/ffffff?text=Area+Rug"] }
     ];
 
     if (!DB.get('products'))     DB.set('products', SEED_PRODUCTS);
     if (!DB.get('users'))        DB.set('users', []);
     if (!DB.get('transactions')) DB.set('transactions', []);
     if (!DB.get('cart'))         DB.set('cart', []);
+    if (!DB.get('reports'))      DB.set('reports', []);
+    if (!DB.get('reviews'))      DB.set('reviews', []);
     if (!DB.get('session'))      DB.set('session', null);
 
     // ── Session ───────────────────────────────────────────────────
-    /**
-     * Returns the active session or null.
-     * @returns {{ userId: string, email: string, name: string, role: 'student'|'admin' }|null}
-     */
     function getSession() { return DB.get('session'); }
-
     function isLoggedIn()   { return getSession() !== null; }
     function isAdmin()      { return getSession()?.role === 'admin'; }
-    function isStudent()    { return isLoggedIn(); } // both roles can act as students
 
     function logout() {
         DB.set('session', null);
@@ -301,37 +474,48 @@
         showSection('home');
     }
 
-    // ── Nav rendering ─────────────────────────────────────────────
     function updateNav() {
         const session = getSession();
         const loggedIn = session !== null;
         const admin    = session?.role === 'admin';
 
-        // Auth toggle
         document.getElementById('nav-guest').classList.toggle('hidden', loggedIn);
         document.getElementById('nav-user').classList.toggle('hidden', !loggedIn);
 
         if (loggedIn) {
             const roleTag = admin ? ' [Admin]' : '';
-            document.getElementById('nav-user-label').textContent =
-                `${session.name}${roleTag}`;
+            document.getElementById('nav-user-label').textContent = `${session.name}${roleTag}`;
         }
 
-        // Conditional nav items
         document.getElementById('nav-cart').classList.toggle('hidden', !loggedIn);
+        document.getElementById('nav-purchases').classList.toggle('hidden', !loggedIn);
         document.getElementById('nav-post').classList.toggle('hidden', !loggedIn);
+        document.getElementById('nav-profile').classList.toggle('hidden', !loggedIn);
         document.getElementById('nav-admin').classList.toggle('hidden', !admin);
         document.getElementById('nav-backend').classList.toggle('hidden', !admin);
 
         updateCartCount();
     }
 
+    function recordTermsAcceptance() {
+        const session = getSession();
+        if (!session) return;
+        session.termsAccepted = true;
+        DB.set('session', session);
+        const users = DB.getOrDefault('users', []);
+        const userIndex = users.findIndex(u => u.id === session.userId);
+        if (userIndex !== -1) {
+            users[userIndex].termsAccepted = true;
+            DB.set('users', users);
+        }
+    }
+
     // ── Section routing ───────────────────────────────────────────
-    const ALL_SECTIONS = ['home','market','cart','admin','backend','about','add-product'];
+    const ALL_SECTIONS = ['home','market','cart','admin','backend','about','add-product','profile','purchases'];
+    let currentProfileName = '';
 
     function showSection(id) {
-        // Access control
-        if ((id === 'cart' || id === 'add-product') && !isLoggedIn()) {
+        if ((id === 'cart' || id === 'add-product' || id === 'profile' || id === 'purchases') && !isLoggedIn()) {
             openAuthModal('login');
             return;
         }
@@ -344,17 +528,29 @@
         const el = document.getElementById(id);
         el.classList.remove('hidden');
         el.classList.remove('fade-in');
-        void el.offsetWidth; // force reflow to re-trigger animation
+        void el.offsetWidth;
         el.classList.add('fade-in');
 
-        if (id === 'market')  renderMarket();
+        if (id === 'add-product') {
+            document.getElementById('upload-error').classList.add('hidden');
+            const session = getSession();
+            const termsBox = document.getElementById('post-terms-container');
+            if (session && !session.termsAccepted) termsBox.classList.remove('hidden');
+            else termsBox.classList.add('hidden');
+        }
+
+        if (id === 'market')  applyFilters(); 
         if (id === 'cart')    renderCart();
+        if (id === 'purchases') renderPurchases();
         if (id === 'admin')   renderAdmin();
-        if (id === 'backend') renderBackend();
+        if (id === 'backend') {
+            document.getElementById('db-table-select').value = 'transactions';
+            renderBackend();
+        }
     }
 
     // ── Auth modal ────────────────────────────────────────────────
-    let authMode = 'login'; // 'login' | 'signup'
+    let authMode = 'login'; 
 
     function openAuthModal(mode = 'login') {
         authMode = mode;
@@ -364,9 +560,7 @@
         document.getElementById('auth-modal').classList.remove('hidden');
     }
 
-    function closeAuthModal() {
-        document.getElementById('auth-modal').classList.add('hidden');
-    }
+    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
     function toggleAuthMode() {
         authMode = authMode === 'login' ? 'signup' : 'login';
@@ -377,9 +571,7 @@
     function _syncAuthModalUI() {
         const isLogin = authMode === 'login';
         document.getElementById('auth-title').textContent       = isLogin ? 'Log in' : 'Create account';
-        document.getElementById('auth-subtitle').textContent    = isLogin
-            ? 'Welcome back! Use your .edu email.'
-            : 'Join Campus Exchange NY with your .edu email.';
+        document.getElementById('auth-subtitle').textContent    = isLogin ? 'Welcome back! Use your .edu email.' : 'Join Campus Exchange NY with your .edu email.';
         document.getElementById('auth-submit-btn').textContent  = isLogin ? 'Log in' : 'Create account';
         document.getElementById('auth-toggle-text').textContent = isLogin ? "Don't have an account?" : "Already have an account?";
         document.getElementById('auth-toggle-btn').textContent  = isLogin ? 'Sign up' : 'Log in';
@@ -396,179 +588,422 @@
         el.classList.remove('hidden');
     }
 
-    function clearAuthError() {
-        document.getElementById('auth-error').classList.add('hidden');
-    }
+    function clearAuthError() { document.getElementById('auth-error').classList.add('hidden'); }
 
-    /**
-     * Handles both login and signup form submission.
-     * Uses async/await with Web Crypto for password hashing.
-     */
     async function handleAuth(e) {
         e.preventDefault();
         clearAuthError();
-
         const email    = document.getElementById('auth-email').value.trim().toLowerCase();
         const password = document.getElementById('auth-pass').value;
 
-        // Validate .edu email
-        if (!email.endsWith('.edu')) {
-            showAuthError('Only .edu email addresses are allowed.');
-            return;
-        }
+        if (!email.endsWith('.edu')) return showAuthError('Only .edu email addresses are allowed.');
 
         const users = DB.get('users');
         const passwordHash = await sha256(password);
 
         if (authMode === 'signup') {
             const name = document.getElementById('auth-name').value.trim();
+            if (!name) return showAuthError('Please enter your full name.');
+            if (users.some(u => u.email === email)) return showAuthError('An account with this email already exists.');
 
-            if (!name) {
-                showAuthError('Please enter your full name.');
-                return;
-            }
-            if (users.some(u => u.email === email)) {
-                showAuthError('An account with this email already exists.');
-                return;
-            }
-
-            // First registered user becomes admin; everyone else is student.
             const role = users.length === 0 ? 'admin' : 'student';
-
-            const newUser = {
-                id:           uuid(),
-                name,
-                email,
-                passwordHash,
-                role,
-                createdAt:    new Date().toISOString()
-            };
-
+            const newUser = { id: uuid(), name, email, passwordHash, role, createdAt: new Date().toISOString(), termsAccepted: false };
             users.push(newUser);
             DB.set('users', users);
-
-            // Auto-login after signup
             _createSession(newUser);
             closeAuthModal();
-
         } else {
-            // Login
             const user = users.find(u => u.email === email);
-
-            if (!user || user.passwordHash !== passwordHash) {
-                showAuthError('Invalid email or password.');
-                return;
-            }
-
+            if (!user || user.passwordHash !== passwordHash) return showAuthError('Invalid email or password.');
             _createSession(user);
             closeAuthModal();
         }
     }
 
-    /**
-     * Persists a session for the given user and refreshes the UI.
-     * @param {{ id: string, name: string, email: string, role: string }} user
-     */
     function _createSession(user) {
-        DB.set('session', {
-            userId: user.id,
-            email:  user.email,
-            name:   user.name,
-            role:   user.role
-        });
+        DB.set('session', { userId: user.id, email: user.email, name: user.name, role: user.role, termsAccepted: user.termsAccepted || false });
         updateNav();
         showSection('home');
     }
 
-    // ── Marketplace ───────────────────────────────────────────────
-    function getProducts() { return DB.get('products'); }
-
-    function renderMarket() {
-        const products = getProducts();
-        const session  = getSession();
-        const grid     = document.getElementById('product-grid');
-
-        if (products.length === 0) {
-            grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-16">
-                No items listed. The marketplace is empty!
-            </p>`;
-            return;
+    // ── Shared Card Generator ──────────────────────────────────────
+    function generateProductHtml(p, session) {
+        let btn;
+        if (!isLoggedIn()) {
+            btn = `<button onclick="openAuthModal('login')" class="w-full bg-gray-100 text-gray-400 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition mt-4">Log in to Buy</button>`;
+        } else if (session && p.seller === session.name) {
+            btn = `<button disabled class="w-full bg-gray-50 text-gray-300 py-2 rounded-lg text-sm cursor-not-allowed mt-4 border border-dashed border-gray-300">Your Listing</button>`;
+        } else {
+            btn = `<button onclick="addToCart(${p.id})" class="w-full bg-blue-50 text-blue-800 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 transition mt-4">Add to Cart</button>`;
         }
 
-        grid.innerHTML = products.map(p => {
-            // Determine button: can't buy your own listing
-            let btn;
-            if (!isLoggedIn()) {
-                btn = `<button onclick="openAuthModal('login')" class="w-full bg-gray-100 text-gray-400 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">Log in to Buy</button>`;
-            } else if (session && p.sellerId === session.userId) {
-                btn = `<button disabled class="w-full bg-gray-50 text-gray-300 py-2 rounded-lg text-sm cursor-not-allowed">Your Listing</button>`;
-            } else {
-                btn = `<button onclick="addToCart(${p.id})" class="w-full bg-blue-50 text-blue-800 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 transition">Add to Cart</button>`;
-            }
+        const imageArray = p.images || [p.image];
+        const imagesHtml = imageArray.map(img => `<img src="${escHtml(img)}" alt="${escHtml(p.title)}" class="w-full h-full object-cover flex-shrink-0 snap-center">`).join('');
+        const badgeHtml = imageArray.length > 1 ? `<div class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-[10px] font-bold px-2 py-1 rounded shadow pointer-events-none tracking-wide">SWIPE FOR MORE</div>` : '';
+        
+        const transferText = p.transferMethods && p.transferMethods.includes('Pickup') 
+            ? 'Location available upon request' 
+            : (p.transferMethods ? p.transferMethods.join(', ') : 'Location hidden');
 
-            return `
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
-                    <div class="mb-4">
+        return `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition overflow-hidden">
+                <div class="relative w-full h-48 bg-gray-100">
+                    <div class="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">${imagesHtml}</div>
+                    ${badgeHtml}
+                </div>
+                <div class="p-5 flex flex-col flex-grow justify-between">
+                    <div>
                         <h3 class="font-bold text-base text-gray-900">${escHtml(p.title)}</h3>
                         <p class="text-xl font-black text-green-600 my-1">${p.price === 0 ? 'FREE' : '$' + p.price}</p>
-                        <p class="text-sm text-gray-500 mb-3 leading-snug">${escHtml(p.desc)}</p>
-                        <p class="text-xs text-blue-400">Posted by ${escHtml(p.seller)}</p>
+                        <p class="text-sm text-gray-500 mb-2 leading-snug">${escHtml(p.desc)}</p>
+                        
+                        <div class="mt-3 flex flex-col space-y-1">
+                            <p class="text-xs text-gray-500 flex items-center font-semibold">
+                                📍 ${escHtml(p.location || "N/A")} — <span class="font-normal italic ml-1 text-gray-400">${transferText}</span>
+                            </p>
+                            <p class="text-xs text-gray-500 flex items-center">
+                                👤&nbsp;<button onclick="viewProfile('${escHtml(p.seller)}')" class="text-blue-600 font-bold hover:underline">${escHtml(p.seller)}</button>
+                            </p>
+                        </div>
                     </div>
                     ${btn}
+                </div>
+            </div>`;
+    }
+
+    // ── Marketplace Filter/Search Features ────────────────────────
+    function getProducts() { return DB.getOrDefault('products', []); }
+
+    function applyFilters() {
+        const itemQuery = document.getElementById('filter-item').value.toLowerCase();
+        const locQuery = document.getElementById('filter-location').value;
+        const sellerQuery = document.getElementById('filter-seller').value.toLowerCase();
+        
+        const minPriceVal = document.getElementById('filter-min-price').value;
+        const maxPriceVal = document.getElementById('filter-max-price').value;
+        const minPrice = minPriceVal !== '' ? parseFloat(minPriceVal) : 0;
+        const maxPrice = maxPriceVal !== '' ? parseFloat(maxPriceVal) : Infinity;
+
+        const allProducts = getProducts();
+        const filtered = allProducts.filter(p => {
+            const matchItem = p.title.toLowerCase().includes(itemQuery) || (p.desc && p.desc.toLowerCase().includes(itemQuery));
+            const matchLoc = locQuery === '' || p.location === locQuery;
+            const matchSeller = sellerQuery === '' || (p.seller && p.seller.toLowerCase().includes(sellerQuery));
+            const matchPrice = p.price >= minPrice && p.price <= maxPrice;
+            return matchItem && matchLoc && matchSeller && matchPrice;
+        });
+
+        const grid = document.getElementById('product-grid');
+        const session = getSession();
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-16">No items match your filters.</p>`;
+        } else {
+            grid.innerHTML = filtered.map(p => generateProductHtml(p, session)).join('');
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('filter-item').value = '';
+        document.getElementById('filter-location').value = '';
+        document.getElementById('filter-seller').value = '';
+        document.getElementById('filter-min-price').value = '';
+        document.getElementById('filter-max-price').value = '';
+        applyFilters();
+    }
+
+    // ── Seller Profile & Rating Features ──────────────────────────
+    function viewMyProfile() {
+        const session = getSession();
+        if(!session) return openAuthModal('login');
+        viewProfile(session.name);
+    }
+
+    function getStarHtml(rating) {
+        return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    }
+
+    function viewProfile(sellerName) {
+        currentProfileName = sellerName;
+        const session = getSession();
+        const isSelf = session && session.name === sellerName;
+
+        document.getElementById('profile-name').textContent = sellerName;
+        document.getElementById('profile-self-badge').classList.toggle('hidden', !isSelf);
+        document.getElementById('profile-actions').classList.toggle('hidden', isSelf);
+
+        const products = getProducts().filter(p => p.seller === sellerName);
+        const grid = document.getElementById('profile-grid');
+        if (products.length === 0) {
+            grid.innerHTML = `<p class="col-span-full text-gray-500 italic">This seller has no active listings.</p>`;
+        } else {
+            grid.innerHTML = products.map(p => generateProductHtml(p, session)).join('');
+        }
+
+        renderProfileReviews(sellerName, session, isSelf);
+        showSection('profile');
+    }
+
+    function renderProfileReviews(sellerName, session, isSelf) {
+        const allReviews = DB.getOrDefault('reviews', []);
+        const sellerReviews = allReviews.filter(r => r.seller === sellerName);
+        
+        const summaryEl = document.getElementById('profile-rating-summary');
+        if (sellerReviews.length === 0) {
+            summaryEl.innerHTML = `<span class="text-gray-400 font-normal ml-1">(No reviews yet)</span>`;
+        } else {
+            const avg = sellerReviews.reduce((sum, r) => sum + r.rating, 0) / sellerReviews.length;
+            summaryEl.innerHTML = `<span class="star-rating text-lg leading-none">${getStarHtml(Math.round(avg))}</span> <span class="ml-1">${avg.toFixed(1)} (${sellerReviews.length})</span>`;
+        }
+
+        const listEl = document.getElementById('profile-reviews-list');
+        if (sellerReviews.length === 0) {
+            listEl.innerHTML = `<p class="text-gray-500 italic border border-dashed border-gray-200 p-6 rounded-lg text-center">No reviews have been left for this seller yet.</p>`;
+        } else {
+            listEl.innerHTML = sellerReviews.map(r => `
+                <div class="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-bold text-sm text-gray-900">${escHtml(r.reviewer)}</span>
+                            <span class="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-bold ml-2">Verified Buyer</span>
+                        </div>
+                        <span class="text-xs text-gray-400">${r.date}</span>
+                    </div>
+                    <div class="star-rating text-sm mb-1">${getStarHtml(r.rating)}</div>
+                    <p class="text-sm text-gray-700">${escHtml(r.text)}</p>
+                </div>
+            `).join('');
+        }
+
+        const formContainer = document.getElementById('profile-review-form-container');
+        const txns = DB.getOrDefault('transactions', []);
+        const hasBought = txns.some(t => t.buyer === session?.email && t.sellers && t.sellers.includes(sellerName));
+        const alreadyReviewed = sellerReviews.some(r => r.reviewer === session?.name);
+
+        if (session && !isSelf && hasBought && !alreadyReviewed) {
+            formContainer.innerHTML = `
+                <div class="bg-blue-50 border border-blue-100 p-5 rounded-xl sticky top-24">
+                    <h4 class="font-bold text-blue-900 mb-3 text-lg">Leave a Review</h4>
+                    <p class="text-xs text-blue-700 mb-4">You recently purchased an item from ${escHtml(sellerName)}. Share your experience!</p>
+                    <form onsubmit="submitReview(event)" class="space-y-3">
+                        <select id="review-rating" class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                            <option value="">Select a rating...</option>
+                            <option value="5">⭐⭐⭐⭐⭐ - Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ - Good</option>
+                            <option value="3">⭐⭐⭐ - Fair</option>
+                            <option value="2">⭐⭐ - Poor</option>
+                            <option value="1">⭐ - Terrible</option>
+                        </select>
+                        <textarea id="review-text" required rows="3" class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Was the item as described? How was communication?"></textarea>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition shadow-sm">Submit Review</button>
+                    </form>
                 </div>`;
+        } else {
+            formContainer.innerHTML = '';
+        }
+    }
+
+    function submitReview(e) {
+        e.preventDefault();
+        const session = getSession();
+        if(!session) return;
+
+        const rating = parseInt(document.getElementById('review-rating').value);
+        const text = document.getElementById('review-text').value.trim();
+
+        const reviews = DB.getOrDefault('reviews', []);
+        const nextId = reviews.length > 0 ? Math.max(...reviews.map(r => parseInt(r.id) || 0)) + 1 : 1;
+        reviews.push({ id: nextId, seller: currentProfileName, reviewer: session.name, rating: rating, text: text, date: new Date().toLocaleDateString() });
+        DB.set('reviews', reviews);
+        
+        alert('Thank you! Your verified review has been posted.');
+        viewProfile(currentProfileName);
+    }
+
+    function contactSeller() {
+        if (!isLoggedIn()) return openAuthModal('login');
+        alert(`Chat Feature Coming Soon!\n\nYou will soon be able to send secure, direct messages to ${currentProfileName} regarding their items.`);
+    }
+
+    function reportSeller() {
+        if (!isLoggedIn()) return openAuthModal('login');
+        const reason = prompt(`WARNING: You are about to flag ${currentProfileName} for a platform violation.\n\nPlease describe the issue:`);
+        if (!reason || reason.trim() === '') return;
+
+        const reports = DB.getOrDefault('reports', []);
+        const nextId = reports.length > 0 ? Math.max(...reports.map(r => parseInt(r.id) || 0)) + 1 : 1;
+        reports.push({ id: nextId, date: new Date().toLocaleDateString(), reportedSeller: currentProfileName, reporter: getSession().email, reason: reason.trim() });
+        DB.set('reports', reports);
+        alert('Thank you. The report has been successfully submitted to the campus administrative team.');
+    }
+
+    // ── My Purchases ─────────────────────────────────────────────────
+    function renderPurchases() {
+        const txns = DB.getOrDefault('transactions', []);
+        const session = getSession();
+        if(!session) return;
+        
+        const myPurchases = txns.filter(t => t.buyer === session.email).reverse();
+        const container = document.getElementById('purchases-list');
+        
+        if(myPurchases.length === 0) {
+            container.innerHTML = `<p class="text-gray-500 text-center py-8 bg-white rounded-xl border border-dashed border-gray-300">You haven't purchased anything yet.</p>`;
+            return;
+        }
+        
+        container.innerHTML = myPurchases.map(o => {
+            const itemsData = o.purchasedItems || [];
+            
+            const itemsDisplay = itemsData.length > 0 ? itemsData.map(item => {
+                let extraInfo = '';
+                if(item.chosenTransfer === 'Pickup') {
+                    extraInfo = `<br><span class="text-blue-600">Pickup Location provided by seller: <strong>${escHtml(item.specificLocation || item.location || 'Ask in chat')}</strong></span>`;
+                }
+                return `<li class="mb-2"><strong>${escHtml(item.title)}</strong> ($${item.price}) - <span class="italic text-gray-500">Method: ${escHtml(item.chosenTransfer)}</span>${extraInfo}</li>`;
+            }).join('') : `<p>${escHtml(o.items)} (Legacy Order)</p>`;
+
+            const sellersBtns = (o.sellers || []).map(s => `
+                <button onclick="viewProfile('${escHtml(s)}')" class="text-blue-600 font-bold hover:underline bg-blue-50 px-2 py-1 rounded text-xs border border-blue-100 hover:bg-blue-100 transition">
+                    👤 ${escHtml(s)}
+                </button>
+            `).join(' ');
+
+            return `
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center border-b border-gray-100 pb-3 mb-3">
+                    <div class="mb-2 md:mb-0">
+                        <span class="font-bold text-gray-800 text-lg mr-3">${o.orderId}</span>
+                        <span class="text-sm text-gray-500">${o.date}</span>
+                    </div>
+                    <span class="font-bold text-green-600 text-xl">$${o.total.toFixed(2)}</span>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 font-semibold mb-2 uppercase tracking-wider">Items Purchased</p>
+                    <ul class="text-sm text-gray-800 list-disc list-inside ml-4">${itemsDisplay}</ul>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold mb-2 uppercase tracking-wider">Sellers Involved</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${sellersBtns || '<span class="text-xs text-gray-400">Legacy Order (No seller data available)</span>'}
+                    </div>
+                </div>
+            </div>`;
         }).join('');
     }
 
-    function handleAddProduct(e) {
+    // ── Add Product ──────────────────────────────────────────────
+    async function handleAddProduct(e) {
         e.preventDefault();
         const session = getSession();
         if (!session) return;
 
+        const errorBox = document.getElementById('upload-error');
+        errorBox.classList.add('hidden');
+
+        if (!session.termsAccepted) {
+            if (!document.getElementById('post-terms-checkbox').checked) {
+                errorBox.textContent = "You must agree to the Terms and Conditions before posting an item.";
+                return errorBox.classList.remove('hidden');
+            } else recordTermsAcceptance();
+        }
+
         const title = document.getElementById('add-title').value.trim();
         const price = parseFloat(document.getElementById('add-price').value);
         const desc  = document.getElementById('add-desc').value.trim();
+        const loc   = document.getElementById('add-location').value;
+        const specificLoc = document.getElementById('add-specific-location').value.trim();
+        
+        const transferMethods = [];
+        if(document.getElementById('add-transfer-mail').checked) transferMethods.push('Mail');
+        if(document.getElementById('add-transfer-delivery').checked) transferMethods.push('Direct Delivery');
+        if(document.getElementById('add-transfer-pickup').checked) transferMethods.push('Pickup');
+
+        if(transferMethods.length === 0) {
+            errorBox.textContent = "Please select at least one Transfer Method.";
+            return errorBox.classList.remove('hidden');
+        }
+
+        const filesToProcess = Array.from(document.getElementById('add-image').files).slice(0, 3);
+        let processedImages = [];
+
+        if (filesToProcess.length > 0) {
+            for (let file of filesToProcess) {
+                if (file.size > 512000) {
+                    errorBox.textContent = `One of your files (${file.name}) is too large! Each image must be smaller than 500KB.`;
+                    return errorBox.classList.remove('hidden');
+                }
+                try {
+                    const base64Str = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                    processedImages.push(base64Str);
+                } catch (err) {
+                    errorBox.textContent = `Error reading file: ${file.name}`;
+                    return errorBox.classList.remove('hidden');
+                }
+            }
+        } else processedImages.push(`https://placehold.co/600x400/eeeeee/999999?text=${encodeURIComponent(title)}`);
 
         const products = getProducts();
-        products.push({
-            id:       Date.now(),
-            title,
-            price,
-            desc,
-            seller:   session.name,
-            sellerId: session.userId
+        const nextId = products.length > 0 ? Math.max(...products.map(p => parseInt(p.id) || 0)) + 1 : 101;
+
+        products.push({ 
+            id: nextId, 
+            title, 
+            price, 
+            desc, 
+            location: loc,
+            specificLocation: specificLoc,
+            transferMethods: transferMethods,
+            images: processedImages, 
+            seller: session.name, 
+            sellerId: session.userId 
         });
+
         DB.set('products', products);
         e.target.reset();
         showSection('market');
     }
 
-    // ── Cart ──────────────────────────────────────────────────────
+    // ── Cart & Checkout ───────────────────────────────────────────
     function getCart() { return DB.getOrDefault('cart', []); }
 
     function addToCart(productId) {
-        if (!isLoggedIn()) { openAuthModal('login'); return; }
-
+        if (!isLoggedIn()) return openAuthModal('login');
         const product = getProducts().find(p => p.id === productId);
         if (!product) return;
-        if (getCart().some(p => p.id === productId)) {
-            alert('Already in your cart!');
-            return;
-        }
+        if (getCart().some(p => p.id === productId)) return alert('Already in your cart!');
 
         const cart = getCart();
+        // Give it a default transfer method
+        product.chosenTransfer = product.transferMethods ? product.transferMethods[0] : 'Pickup';
         cart.push(product);
         DB.set('cart', cart);
         updateCartCount();
         alert(`"${product.title}" added to cart!`);
     }
 
-    function updateCartCount() {
-        document.getElementById('cart-count').textContent = getCart().length;
+    function updateCartCount() { document.getElementById('cart-count').textContent = getCart().length; }
+
+    function updateCartTransfer(index, val) {
+        const cart = getCart();
+        if(cart[index]) {
+            cart[index].chosenTransfer = val;
+            DB.set('cart', cart);
+        }
     }
 
     function renderCart() {
         const cart      = getCart();
+        const session   = getSession();
         const container = document.getElementById('cart-items');
+
+        const cartTerms = document.getElementById('cart-terms-container');
+        if (session && !session.termsAccepted && cart.length > 0) cartTerms.classList.remove('hidden');
+        else cartTerms.classList.add('hidden');
 
         if (cart.length === 0) {
             container.innerHTML = `<p class="text-gray-400 py-8 text-center">Your cart is empty.</p>`;
@@ -579,16 +1014,32 @@
         let total = 0;
         container.innerHTML = cart.map((p, i) => {
             total += p.price;
+            const thumbImage = p.images ? p.images[0] : p.image;
+            
+            const transferOptions = (p.transferMethods || ['Pickup']).map(m => 
+                `<option value="${m}" ${p.chosenTransfer === m ? 'selected' : ''}>${m}</option>`
+            ).join('');
+
             return `
-                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-lg border">
-                    <h4 class="font-semibold text-sm">${escHtml(p.title)}</h4>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border gap-4">
+                    <div class="flex items-center space-x-4">
+                        <img src="${escHtml(thumbImage)}" alt="${escHtml(p.title)}" class="w-12 h-12 rounded-md object-cover border border-gray-200">
+                        <div>
+                            <h4 class="font-semibold text-sm">${escHtml(p.title)}</h4>
+                            <div class="mt-1 text-xs text-gray-600 flex items-center">
+                                <label class="mr-2 font-bold">Transfer Method:</label>
+                                <select onchange="updateCartTransfer(${i}, this.value)" class="border border-gray-300 rounded p-1 bg-white focus:outline-none focus:ring-1 focus:ring-blue-400">
+                                    ${transferOptions}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="flex items-center space-x-4">
                         <span class="font-bold text-green-600">${p.price === 0 ? 'FREE' : '$' + p.price}</span>
                         <button onclick="removeFromCart(${i})" class="text-red-400 text-xs hover:underline">Remove</button>
                     </div>
                 </div>`;
         }).join('');
-
         document.getElementById('cart-total').textContent = total.toFixed(2);
     }
 
@@ -603,144 +1054,166 @@
     function checkout() {
         const cart    = getCart();
         const session = getSession();
-        if (cart.length === 0) { alert('Your cart is empty.'); return; }
-        if (!session) { openAuthModal('login'); return; }
+        if (cart.length === 0) return alert('Your cart is empty.');
+        if (!session) return openAuthModal('login');
+
+        if (!session.termsAccepted) {
+            if (!document.getElementById('cart-terms-checkbox').checked) return alert("You must agree to the Terms and Conditions to proceed with checkout.");
+            else recordTermsAcceptance();
+        }
 
         const total     = cart.reduce((sum, item) => sum + item.price, 0);
         const itemNames = cart.map(item => item.title).join(', ');
+        const involvedSellers = [...new Set(cart.map(item => item.seller))];
 
-        // Record transaction
+        const purchasedItemsData = cart.map(item => ({
+            title: item.title,
+            seller: item.seller,
+            price: item.price,
+            chosenTransfer: item.chosenTransfer || (item.transferMethods ? item.transferMethods[0] : 'Pickup'),
+            location: item.location,
+            specificLocation: item.specificLocation
+        }));
+
         const txns = DB.getOrDefault('transactions', []);
+        const nextOrderId = txns.length > 0 ? Math.max(...txns.map(t => parseInt(t.orderId.split('-')[1]) || 0)) + 1 : 1000;
+        
         txns.push({
-            orderId: 'ORD-' + Math.floor(Math.random() * 1_000_000),
+            orderId: 'ORD-' + nextOrderId,
             date:    new Date().toLocaleString(),
             buyer:   session.email,
             items:   itemNames,
+            purchasedItems: purchasedItemsData,
+            sellers: involvedSellers,
             total
         });
-        DB.set('transactions', txns);
-
-        // Remove sold items from marketplace
+        
+        DB.set('transactions', txns); 
         const purchasedIds = new Set(cart.map(item => item.id));
         DB.set('products', getProducts().filter(p => !purchasedIds.has(p.id)));
-
-        // Clear cart
         DB.set('cart', []);
         updateCartCount();
-
-        showSection('market');
-        alert(`Order placed!\nTotal: $${total.toFixed(2)}\n\nSold items have been removed from the marketplace.`);
+        showSection('purchases'); 
+        
+        alert(`Order placed successfully!\nTotal: $${total.toFixed(2)}\n\nAn email has been automatically sent to the seller(s) notifying them of your purchase and your chosen transfer method. The seller will be prompted to use the chat function to coordinate logistics (shipping tracking, direct delivery meetup, or exact pickup location).\n\nSold items have been removed from the marketplace.`);
     }
 
-    // ── Admin panel ───────────────────────────────────────────────
+    // ── Admin Panel & DYNAMIC DB Viewer ───────────────────────────────────
     function renderAdmin() {
         const products = getProducts();
         const users    = DB.getOrDefault('users', []);
+        const reports  = DB.getOrDefault('reports', []);
 
-        // Listings table
+        document.getElementById('admin-reports-body').innerHTML = reports.length === 0
+            ? `<tr><td colspan="5" class="p-3 text-gray-500 text-center">No active reports.</td></tr>`
+            : reports.map(r => `
+                <tr class="border-b hover:bg-red-50 text-sm">
+                    <td class="p-3 text-gray-500 whitespace-nowrap">${r.date}</td>
+                    <td class="p-3 font-bold text-gray-800">${escHtml(r.reportedSeller)}</td>
+                    <td class="p-3 italic text-gray-600">"${escHtml(r.reason)}"</td>
+                    <td class="p-3 text-gray-500">${escHtml(r.reporter)}</td>
+                    <td class="p-3"><button onclick="adminDismissReport(${r.id})" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs font-semibold">Dismiss</button></td>
+                </tr>`).join('');
+
         document.getElementById('admin-table-body').innerHTML = products.length === 0
             ? `<tr><td colspan="5" class="p-3 text-gray-400 text-center">No active listings.</td></tr>`
             : products.map(p => `
                 <tr class="border-b hover:bg-gray-50 text-sm">
                     <td class="p-3 text-gray-400 font-mono">#${p.id}</td>
                     <td class="p-3 font-semibold">${escHtml(p.title)}</td>
-                    <td class="p-3">${p.price === 0 ? 'FREE' : '$' + p.price}</td>
+                    <td class="p-3 text-gray-500">${escHtml(p.location || 'N/A')}</td>
                     <td class="p-3 text-gray-500">${escHtml(p.seller)}</td>
-                    <td class="p-3">
-                        <button onclick="adminDeleteProduct(${p.id})"
-                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold">
-                            Delete
-                        </button>
-                    </td>
+                    <td class="p-3"><button onclick="adminDeleteProduct(${p.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold">Delete</button></td>
                 </tr>`).join('');
 
-        // Users table
         const session = getSession();
         document.getElementById('admin-users-body').innerHTML = users.length === 0
-            ? `<tr><td colspan="5" class="p-3 text-gray-400 text-center">No registered users.</td></tr>`
+            ? `<tr><td colspan="6" class="p-3 text-gray-400 text-center">No registered users.</td></tr>`
             : users.map(u => {
-                const isSelf   = session && u.id === session.userId;
-                const roleBadge = u.role === 'admin'
-                    ? `<span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-semibold">Admin</span>`
-                    : `<span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-semibold">Student</span>`;
+                const isSelf = session && u.id === session.userId;
+                const roleBadge = u.role === 'admin' ? `<span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-semibold">Admin</span>` : `<span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-semibold">Student</span>`;
+                const termsBadge = u.termsAccepted ? `<span class="text-green-600 font-bold text-xs">✓ Yes</span>` : `<span class="text-gray-400 font-medium text-xs">Pending</span>`;
                 return `
                     <tr class="border-b hover:bg-gray-50 text-sm">
                         <td class="p-3 font-semibold">${escHtml(u.name)} ${isSelf ? '<span class="text-xs text-gray-400">(you)</span>' : ''}</td>
                         <td class="p-3 text-gray-500">${escHtml(u.email)}</td>
                         <td class="p-3">${roleBadge}</td>
                         <td class="p-3 text-gray-400">${new Date(u.createdAt).toLocaleDateString()}</td>
-                        <td class="p-3">
-                            ${!isSelf ? `<button onclick="adminToggleRole('${u.id}')"
-                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs font-semibold">
-                                Toggle Role
-                            </button>` : '—'}
-                        </td>
+                        <td class="p-3">${termsBadge}</td>
+                        <td class="p-3">${!isSelf ? `<button onclick="adminToggleRole('${u.id}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs font-semibold">Toggle Role</button>` : '—'}</td>
                     </tr>`;
             }).join('');
     }
 
+    function adminDismissReport(id) {
+        if (!confirm('Dismiss this report from the queue?')) return;
+        DB.set('reports', DB.getOrDefault('reports', []).filter(r => r.id !== id));
+        renderAdmin();
+    }
     function adminDeleteProduct(id) {
         if (!confirm('Remove this listing from the marketplace?')) return;
         DB.set('products', getProducts().filter(p => p.id !== id));
         renderAdmin();
     }
-
     function adminToggleRole(userId) {
         const users = DB.getOrDefault('users', []);
         const user  = users.find(u => u.id === userId);
         if (!user) return;
-
         const newRole = user.role === 'admin' ? 'student' : 'admin';
         if (!confirm(`Change ${user.name}'s role to "${newRole}"?`)) return;
-
         user.role = newRole;
         DB.set('users', users);
         renderAdmin();
     }
 
-    // ── Backend / DB viewer ───────────────────────────────────────
     function renderBackend() {
-        const txns  = DB.getOrDefault('transactions', []);
+        const tableName = document.getElementById('db-table-select').value;
+        const data = DB.getOrDefault(tableName, []);
+        const thead = document.getElementById('backend-table-head');
         const tbody = document.getElementById('backend-table-body');
 
-        tbody.innerHTML = txns.length === 0
-            ? `<tr><td colspan="5" class="p-3 text-gray-500 text-center">No orders yet.</td></tr>`
-            : txns.map(t => `
-                <tr class="border-b border-gray-700 hover:bg-gray-800 text-sm">
-                    <td class="p-3 font-mono text-purple-300">${t.orderId}</td>
-                    <td class="p-3">${t.date}</td>
-                    <td class="p-3 text-blue-300">${escHtml(t.buyer)}</td>
-                    <td class="p-3 truncate max-w-xs text-gray-300" title="${escHtml(t.items)}">${escHtml(t.items)}</td>
-                    <td class="p-3 font-bold text-green-400">$${t.total.toFixed(2)}</td>
-                </tr>`).join('');
+        if (!data || data.length === 0) {
+            thead.innerHTML = '';
+            tbody.innerHTML = `<tr><td class="p-3 text-gray-500 text-center italic">0 records found in ${tableName} table.</td></tr>`;
+            return;
+        }
+
+        const keys = Array.from(new Set(data.flatMap(Object.keys)));
+        
+        thead.innerHTML = `
+            <tr class="bg-gray-800 border-b border-gray-700 text-gray-400 text-xs uppercase">
+                ${keys.map(k => `<th class="p-3">${escHtml(k)}</th>`).join('')}
+            </tr>
+        `;
+
+        tbody.innerHTML = data.map(row => `
+            <tr class="border-b border-gray-700 hover:bg-gray-800 text-sm">
+                ${keys.map(k => {
+                    let val = row[k];
+                    if (val === undefined || val === null) val = 'NULL';
+                    else if (typeof val === 'object') val = JSON.stringify(val);
+                    return `<td class="p-3 truncate max-w-[250px] text-gray-300" title="${escHtml(String(val))}">${escHtml(String(val))}</td>`;
+                }).join('')}
+            </tr>
+        `).join('');
     }
 
-    function clearTransactions() {
-        if (!confirm('Wipe all transaction history?')) return;
-        DB.set('transactions', []);
+    function clearSelectedTable() {
+        const tableName = document.getElementById('db-table-select').value;
+        if (!confirm(`WARNING: Wipe all data in the '${tableName}' table?`)) return;
+        DB.set(tableName, []);
         renderBackend();
     }
 
     function factoryReset() {
-        if (!confirm('WARNING: This resets the entire database — all users, listings, and orders will be erased. Are you sure?')) return;
+        if (!confirm('WARNING: This resets the entire database — all users, listings, reviews, and orders will be erased. Are you sure?')) return;
         localStorage.clear();
         location.reload();
     }
 
-    // ── Utility ───────────────────────────────────────────────────
-    /**
-     * Escapes user-supplied strings before injecting into innerHTML
-     * to prevent XSS.
-     * @param {string} str
-     * @returns {string}
-     */
     function escHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
     // ── Init ──────────────────────────────────────────────────────
